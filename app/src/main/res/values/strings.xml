@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SMSPost</string>
+    <string name="hint_url">POST URL (e.g. http://192.168.1.1/api)</string>
+    <string name="hint_user">Basic Auth Username (Optional)</string>
+    <string name="hint_pass">Basic Auth Password (Optional)</string>
+    <string name="btn_save">Save Configuration</string>
+    <string name="title_logs">SMS Forwarder Logs</string>
+    <string name="btn_refresh">Refresh Logs</string>
+    <string name="empty_logs">No logs found.</string>
+    <string name="initial_logs">Logs will appear here...</string>
+
+    <string name="toast_permission_granted">权限已授予，服务启动中</string>
+    <string name="toast_permission_denied">请授予短信及通知权限以使应用正常工作</string>
+    <string name="toast_config_saved">Configuration saved</string>
+
+    <string name="notif_title">短信转发运行中</string>
+    <string name="notif_content">正在后台监听并转发新收到的短信</string>
+    <string name="channel_name">SMS Forwarding Service Channel</string>
+
+    <string name="status_url_not_set">Error: URL not set</string>
+    <string name="status_success">Success</string>
+    <string name="status_failed">Failed: %1$s</string>
+    <string name="status_failed_code">Failed Code: %1$d</string>
+    <string name="log_format">[%1$s] From: %2$s\nContent: %3$s\nStatus: %4$s</string>
+</resources>
