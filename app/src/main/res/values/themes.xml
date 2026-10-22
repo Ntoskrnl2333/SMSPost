@@ -42,6 +42,7 @@
         <item name="textInputStyle">@style/Widget.SMSPost.TextInputLayout</item>
         <item name="materialButtonStyle">@style/Widget.SMSPost.Button</item>
         <item name="materialCardViewStyle">@style/Widget.SMSPost.Card</item>
+        <item name="snackbarStyle">@style/Widget.SMSPost.Snackbar</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
     </style>

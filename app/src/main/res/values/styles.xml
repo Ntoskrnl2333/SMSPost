@@ -111,4 +111,14 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">14sp</item>
     </style>
+
+    <style name="ShapeAppearance.SMSPost.Snackbar" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="Widget.SMSPost.Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="android:layout_margin">16dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.SMSPost.Snackbar</item>
+    </style>
 </resources>

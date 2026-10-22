@@ -11,6 +11,7 @@
     <color name="hero_eyebrow">#8FC2F7</color>
     <color name="hero_status_pill_bg">#33FFFFFF</color>
     <color name="hero_signal_arc">#3396C8FF</color>
+    <color name="notification_accent">#1B5187</color>
     <color name="status_dot_active">#6BE3AE</color>
     <color name="status_dot_amber">#FFC46B</color>
 
