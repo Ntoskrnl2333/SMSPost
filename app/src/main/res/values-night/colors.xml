@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== Brand / hero surface (night) ===== -->
+    <color name="hero_gradient_start">#071322</color>
+    <color name="hero_gradient_end">#0D2B4C</color>
+    <color name="hero_text_primary">#F4F8FF</color>
+    <color name="hero_text_secondary">#B9CFE9</color>
+    <color name="hero_eyebrow">#86B8EE</color>
+    <color name="hero_status_pill_bg">#29FFFFFF</color>
+    <color name="hero_signal_arc">#2A8FC2F7</color>
+    <color name="status_dot_active">#63E0AC</color>
+    <color name="status_dot_amber">#FFC46B</color>
+
+    <!-- ===== Material 3 colour roles (dark) ===== -->
+    <color name="md_primary">#A9C9FF</color>
+    <color name="md_on_primary">#003062</color>
+    <color name="md_primary_container">#154A80</color>
+    <color name="md_on_primary_container">#D3E3FF</color>
+    <color name="md_secondary">#B7C7D9</color>
+    <color name="md_on_secondary">#22313F</color>
+    <color name="md_secondary_container">#33414F</color>
+    <color name="md_on_secondary_container">#D9E2EE</color>
+    <color name="md_tertiary">#FFB68D</color>
+    <color name="md_on_tertiary">#4E1A00</color>
+    <color name="md_tertiary_container">#71320D</color>
+    <color name="md_on_tertiary_container">#FFDCC6</color>
+    <color name="md_background">#0A0F16</color>
+    <color name="md_on_background">#E3E6EC</color>
+    <color name="md_surface">#131B26</color>
+    <color name="md_on_surface">#E3E6EC</color>
+    <color name="md_surface_variant">#3E4652</color>
+    <color name="md_on_surface_variant">#C3C7D0</color>
+    <color name="md_outline">#8D919A</color>
+    <color name="md_outline_variant">#5F6A79</color>
+    <color name="md_error">#FFB4AB</color>
+    <color name="md_on_error">#690005</color>
+    <color name="md_error_container">#93000A</color>
+    <color name="md_on_error_container">#FFDAD6</color>
+    <color name="md_surface_inverse">#E3E6EC</color>
+    <color name="md_on_surface_inverse">#2F3135</color>
+
+    <!-- ===== Semantic status colours ===== -->
+    <color name="status_success">#7FDCB4</color>
+    <color name="status_error">#FFB4AB</color>
+    <color name="status_warning_text">#FFCE8F</color>
+    <color name="status_neutral">#C3C7D0</color>
+    <color name="status_warning_container">#3A2A0A</color>
+    <color name="status_warning_border">#7A5A26</color>
+</resources>

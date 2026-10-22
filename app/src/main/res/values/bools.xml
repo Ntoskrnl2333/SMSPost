@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light theme: dark navigation icons over the light page background. -->
+    <bool name="window_light_navigation_bar">true</bool>
+</resources>

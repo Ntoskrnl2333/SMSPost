@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">SMSPost</string>
+
+    <!-- Hero -->
+    <string name="hero_eyebrow">短信中继</string>
+    <string name="hero_subtitle">短信转发，随时随地。</string>
+    <string name="status_active">中继已就绪</string>
+    <string name="status_needs_setup">需要完成设置</string>
+    <string name="status_needs_endpoint">未配置接口</string>
+    <string name="status_setup_hint">请授予必要权限</string>
+    <string name="endpoint_not_set">尚未配置转发地址</string>
+    <string name="endpoint_copied">转发地址已复制</string>
+
+    <!-- Configuration -->
+    <string name="section_endpoint">转发地址</string>
+    <string name="badge_required">必填</string>
+    <string name="hint_url">接口 URL</string>
+    <string name="helper_url">收到的短信将以 JSON 形式 POST 到此地址。</string>
+    <string name="hint_user">用户名</string>
+    <string name="hint_pass">密码</string>
+    <string name="auth_title">Basic 认证</string>
+    <string name="auth_subtitle">可选 · 通过 HTTP 请求头发送</string>
+    <string name="btn_save">保存并重启服务</string>
+    <string name="error_url_required">请输入短信要转发到的地址</string>
+    <string name="error_url_invalid">地址必须以 http:// 或 https:// 开头</string>
+    <string name="snack_config_saved">地址已保存，服务已重启。</string>
+
+    <!-- Delivery log -->
+    <string name="logs_title">投递记录</string>
+    <string name="refresh">刷新记录</string>
+    <string name="log_count_desc">共 %1$d 条</string>
+    <string name="unknown_sender">未知号码</string>
+    <string name="empty_title">还没有转发记录</string>
+    <string name="empty_body">收到短信后会自动投递到上面的地址，并在这里留下记录。</string>
+    <string name="empty_title_no_access">无法读取投递记录</string>
+    <string name="empty_body_no_access">请授予存储权限，服务才能写入记录，本页也才能读取显示。</string>
+
+    <!-- Permissions -->
+    <string name="permission_title">缺少必要权限</string>
+    <string name="permission_body">请授予短信、通知和存储权限，以便在后台持续转发。</string>
+    <string name="btn_grant">授权</string>
+    <string name="open_settings">设置</string>
+    <string name="permission_denied_snack">短信权限已被拒绝，请到系统设置中开启后再转发。</string>
+
+    <!-- Kept for compatibility with older surfaces -->
+    <string name="toast_permission_granted">权限已授予，服务启动中</string>
+    <string name="toast_permission_denied">请授予短信及通知权限以使应用正常工作</string>
+
+    <string name="notif_title">短信转发运行中</string>
+    <string name="notif_content">正在后台监听并转发新收到的短信</string>
+    <string name="channel_name">短信转发服务通知</string>
+
+    <string name="status_url_not_set">错误：未设置 URL</string>
+    <string name="status_success">成功</string>
+    <string name="status_failed">失败：%1$s</string>
+    <string name="status_failed_code">失败，状态码：%1$d</string>
+</resources>

@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- ===================== Hero ===================== -->
+    <FrameLayout
+        android:id="@+id/hero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_hero">
+
+        <ImageView
+            android:layout_width="240dp"
+            android:layout_height="190dp"
+            android:layout_gravity="top|end"
+            android:importantForAccessibility="no"
+            android:scaleType="fitStart"
+            android:src="@drawable/decor_signal_arcs" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingTop="26dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="52dp">
+
+            <TextView
+                android:id="@+id/tv_eyebrow"
+                style="@style/TextAppearance.SMSPost.Eyebrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hero_eyebrow" />
+
+            <TextView
+                android:id="@+id/tv_hero_title"
+                style="@style/TextAppearance.SMSPost.HeroTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/app_name" />
+
+            <TextView
+                android:id="@+id/tv_hero_subtitle"
+                style="@style/TextAppearance.SMSPost.HeroSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/hero_subtitle" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/status_pill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_status_pill"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp">
+
+                    <View
+                        android:id="@+id/status_dot"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/bg_dot_active" />
+
+                    <TextView
+                        android:id="@+id/tv_hero_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/status_active"
+                        android:textColor="@color/hero_text_primary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_endpoint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawableEnd="@drawable/ic_copy"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="@color/hero_eyebrow"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:minHeight="48dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:textColor="@color/hero_text_secondary"
+                    android:textSize="12sp"
+                    tools:text="http://192.168.1.10:8080/api/sms" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ===================== Configuration ===================== -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/config_card"
+        style="@style/Widget.SMSPost.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="-28dp"
+        android:layout_marginEnd="@dimen/screen_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:padding="@dimen/card_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextAppearance.SMSPost.SectionTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/section_endpoint" />
+
+                <TextView
+                    android:id="@+id/tv_badge_required"
+                    style="@style/TextAppearance.SMSPost.Badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/badge_required" />
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_url"
+                style="@style/Widget.SMSPost.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/hint_url"
+                app:helperText="@string/helper_url"
+                app:helperTextEnabled="true"
+                app:startIconDrawable="@drawable/ic_link"
+                app:startIconTint="?attr/colorOnSurfaceVariant">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri"
+                    android:maxLines="1"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/auth_toggle_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="false"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:orientation="horizontal"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/auth_title"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/auth_subtitle"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_auth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:contentDescription="@string/auth_title" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/auth_fields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_user"
+                    style="@style/Widget.SMSPost.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_user"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:startIconTint="?attr/colorOnSurfaceVariant">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_user"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_pass"
+                    style="@style/Widget.SMSPost.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/hint_pass"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:startIconTint="?attr/colorOnSurfaceVariant">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_pass"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/btn_save"
+                app:icon="@drawable/ic_check"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <include
+        layout="@layout/view_permission_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- ===================== Delivery log ===================== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            style="@style/TextAppearance.SMSPost.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/logs_title" />
+
+        <TextView
+            android:id="@+id/tv_log_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_count_chip"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:minWidth="24dp"
+            android:paddingStart="6dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="2dp"
+            android:text="0"
+            android:textColor="@color/md_on_primary_container"
+            android:textSize="11sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btn_refresh"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/refresh"
+            android:src="@drawable/ic_refresh"
+            android:tint="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+
+    <include
+        layout="@layout/view_empty_logs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

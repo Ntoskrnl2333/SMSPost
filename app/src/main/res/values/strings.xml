@@ -1,25 +1,57 @@
 <resources>
     <string name="app_name">SMSPost</string>
-    <string name="hint_url">POST URL (e.g. http://192.168.1.1/api)</string>
-    <string name="hint_user">Basic Auth Username (Optional)</string>
-    <string name="hint_pass">Basic Auth Password (Optional)</string>
-    <string name="btn_save">Save Configuration</string>
-    <string name="title_logs">SMS Forwarder Logs</string>
-    <string name="btn_refresh">Refresh Logs</string>
-    <string name="empty_logs">No logs found.</string>
-    <string name="initial_logs">Logs will appear here...</string>
 
-    <string name="toast_permission_granted">权限已授予，服务启动中</string>
-    <string name="toast_permission_denied">请授予短信及通知权限以使应用正常工作</string>
-    <string name="toast_config_saved">Configuration saved</string>
+    <!-- Hero -->
+    <string name="hero_eyebrow">SMS relay</string>
+    <string name="hero_subtitle">Watch your SMS, anywhere you like.</string>
+    <string name="status_active">Relay ready</string>
+    <string name="status_needs_setup">Setup needed</string>
+    <string name="status_needs_endpoint">Needs endpoint</string>
+    <string name="status_setup_hint">Grant the required permissions</string>
+    <string name="endpoint_not_set">No endpoint configured</string>
+    <string name="endpoint_copied">Endpoint copied to clipboard</string>
 
-    <string name="notif_title">短信转发运行中</string>
-    <string name="notif_content">正在后台监听并转发新收到的短信</string>
+    <!-- Configuration -->
+    <string name="section_endpoint">Relay endpoint</string>
+    <string name="badge_required">Required</string>
+    <string name="hint_url">Endpoint URL</string>
+    <string name="helper_url">Messages are POSTed here as JSON.</string>
+    <string name="hint_user">Username</string>
+    <string name="hint_pass">Password</string>
+    <string name="auth_title">Basic auth</string>
+    <string name="auth_subtitle">Optional · sent as an HTTP header</string>
+    <string name="btn_save">Save &amp; restart service</string>
+    <string name="error_url_required">Enter the URL messages should be posted to</string>
+    <string name="error_url_invalid">URL must start with http:// or https://</string>
+    <string name="snack_config_saved">Endpoint saved. Service restarted.</string>
+
+    <!-- Delivery log -->
+    <string name="logs_title">Delivery log</string>
+    <string name="refresh">Refresh logs</string>
+    <string name="log_count_desc">%1$d messages</string>
+    <string name="unknown_sender">Unknown sender</string>
+    <string name="empty_title">No forwarded messages yet</string>
+    <string name="empty_body">When an SMS arrives it is posted to your endpoint and logged here.</string>
+    <string name="empty_title_no_access">Log access is blocked</string>
+    <string name="empty_body_no_access">Grant storage access so the service can write delivery entries and this page can read them.</string>
+
+    <!-- Permissions -->
+    <string name="permission_title">Permissions needed</string>
+    <string name="permission_body">Allow SMS access, notifications and storage so forwarding can run in the background.</string>
+    <string name="btn_grant">Grant</string>
+    <string name="open_settings">Settings</string>
+    <string name="permission_denied_snack">SMS permission is blocked. Enable it in Settings to forward messages.</string>
+
+    <!-- Kept for compatibility with older surfaces -->
+    <string name="toast_permission_granted">Permissions granted. Starting service.</string>
+    <string name="toast_permission_denied">SMS and notification permissions are required for this app to work.</string>
+
+    <string name="notif_title">SMS forwarding is running</string>
+    <string name="notif_content">Listening for new SMS and forwarding them in the background</string>
     <string name="channel_name">SMS Forwarding Service Channel</string>
 
     <string name="status_url_not_set">Error: URL not set</string>
     <string name="status_success">Success</string>
     <string name="status_failed">Failed: %1$s</string>
     <string name="status_failed_code">Failed Code: %1$d</string>
-    <string name="log_format">[%1$s] From: %2$s\nContent: %3$s\nStatus: %4$s</string>
 </resources>

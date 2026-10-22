@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="190dp"
+    android:viewportWidth="240"
+    android:viewportHeight="190"
+    android:autoMirrored="true">
+    <!-- Signal waves radiating from the top-right corner of the hero panel. -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M186,6 A52,52 0 0 1 238,58"
+        android:strokeColor="@color/hero_signal_arc"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M142,6 A96,96 0 0 1 238,102"
+        android:strokeColor="@color/hero_signal_arc"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M98,6 A140,140 0 0 1 238,146"
+        android:strokeColor="@color/hero_signal_arc"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,6 A184,184 0 0 1 238,190"
+        android:strokeColor="@color/hero_signal_arc"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.2" />
+</vector>

@@ -2,4 +2,51 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- ===== Brand / hero surface ===== -->
+    <color name="hero_gradient_start">#0A1B30</color>
+    <color name="hero_gradient_end">#123C6B</color>
+    <color name="hero_text_primary">#FFFFFF</color>
+    <color name="hero_text_secondary">#C6DAF2</color>
+    <color name="hero_eyebrow">#8FC2F7</color>
+    <color name="hero_status_pill_bg">#33FFFFFF</color>
+    <color name="hero_signal_arc">#3396C8FF</color>
+    <color name="status_dot_active">#6BE3AE</color>
+    <color name="status_dot_amber">#FFC46B</color>
+
+    <!-- ===== Material 3 colour roles (light) ===== -->
+    <color name="md_primary">#1B5187</color>
+    <color name="md_on_primary">#FFFFFF</color>
+    <color name="md_primary_container">#D3E3FF</color>
+    <color name="md_on_primary_container">#001B3B</color>
+    <color name="md_secondary">#52606F</color>
+    <color name="md_on_secondary">#FFFFFF</color>
+    <color name="md_secondary_container">#D9E2EE</color>
+    <color name="md_on_secondary_container">#131C26</color>
+    <color name="md_tertiary">#A9551E</color>
+    <color name="md_on_tertiary">#FFFFFF</color>
+    <color name="md_tertiary_container">#FFDCC6</color>
+    <color name="md_on_tertiary_container">#351000</color>
+    <color name="md_background">#F6F8FB</color>
+    <color name="md_on_background">#1A1C1F</color>
+    <color name="md_surface">#FFFFFF</color>
+    <color name="md_on_surface">#1A1C1F</color>
+    <color name="md_surface_variant">#E2E7EF</color>
+    <color name="md_on_surface_variant">#454A52</color>
+    <color name="md_outline">#757A83</color>
+    <color name="md_outline_variant">#C9CED7</color>
+    <color name="md_error">#B3261E</color>
+    <color name="md_on_error">#FFFFFF</color>
+    <color name="md_error_container">#FFDAD6</color>
+    <color name="md_on_error_container">#410E0B</color>
+    <color name="md_surface_inverse">#2F3135</color>
+    <color name="md_on_surface_inverse">#F0F1F5</color>
+
+    <!-- ===== Semantic status colours ===== -->
+    <color name="status_success">#146C4A</color>
+    <color name="status_error">#A3261B</color>
+    <color name="status_warning_text">#8A4B00</color>
+    <color name="status_neutral">#5A6068</color>
+    <color name="status_warning_container">#FFEFD9</color>
+    <color name="status_warning_border">#F2C98C</color>
 </resources>

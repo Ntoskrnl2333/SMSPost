@@ -12,6 +12,7 @@ import java.util.List;
 public class LogDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "/storage/emulated/0/smspost_log.db";
     private static final int DATABASE_VERSION = 1;
+    private static final int MAX_LOG_ROWS = 500;
 
     public static final String TABLE_LOGS = "sms_logs";
     public static final String COLUMN_ID = "_id";
@@ -19,8 +20,6 @@ public class LogDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_SENDER = "sender";
     public static final String COLUMN_CONTENT = "content";
     public static final String COLUMN_STATUS = "status";
-
-    private final Context context;
 
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_LOGS + " (" +
@@ -32,7 +31,6 @@ public class LogDatabaseHelper extends SQLiteOpenHelper {
 
     public LogDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
     }
 
     @Override
@@ -56,27 +54,31 @@ public class LogDatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_LOGS, null, values);
     }
 
-    public List<String> getAllLogs() {
-        List<String> logs = new ArrayList<>();
+    /**
+     * Returns the delivery log, newest first. Reads raw columns so the UI can render
+     * structured cards instead of a single formatted string.
+     */
+    public List<LogEntry> getLogEntries() {
+        List<LogEntry> entries = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_LOGS, null, null, null, null, null, COLUMN_ID + " DESC");
+        Cursor cursor = db.query(
+                TABLE_LOGS,
+                new String[]{COLUMN_TIMESTAMP, COLUMN_SENDER, COLUMN_CONTENT, COLUMN_STATUS},
+                null, null, null, null,
+                COLUMN_ID + " DESC",
+                String.valueOf(MAX_LOG_ROWS));
 
-        if (cursor.moveToFirst()) {
-            do {
-                long time = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIMESTAMP));
-                String sender = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SENDER));
-                String content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT));
-                String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
-                
-                String logEntry = context.getString(R.string.log_format, 
-                        new java.util.Date(time).toString(), 
-                        sender, 
-                        content, 
-                        status);
-                logs.add(logEntry);
-            } while (cursor.moveToNext());
+        try {
+            while (cursor.moveToNext()) {
+                long timestamp = cursor.getLong(0);
+                String sender = cursor.getString(1);
+                String content = cursor.getString(2);
+                String status = cursor.getString(3);
+                entries.add(new LogEntry(timestamp, sender, content, status));
+            }
+        } finally {
+            cursor.close();
         }
-        cursor.close();
-        return logs;
+        return entries;
     }
 }
