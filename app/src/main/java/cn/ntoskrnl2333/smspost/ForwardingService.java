@@ -10,6 +10,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +48,7 @@ public class ForwardingService extends Service {
 
     private PowerManager.WakeLock wakeLock;
     private WifiManager.WifiLock wifiLock;
+    private Bitmap notificationLargeIcon;
     private LogDatabaseHelper dbHelper;
     private ConfigManager configManager;
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -180,7 +183,8 @@ public class ForwardingService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.notif_title))
                 .setContentText(getString(R.string.notif_content))
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_stat_smspost)
+                .setLargeIcon(getNotificationLargeIcon())
                 .setColor(getColor(R.color.md_primary))
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
@@ -189,6 +193,18 @@ public class ForwardingService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build();
+    }
+
+    /**
+     * Full-colour app artwork shown on the right of the expanded notification; the small
+     * icon above stays a monochrome silhouette as Android requires.
+     */
+    private Bitmap getNotificationLargeIcon() {
+        if (notificationLargeIcon == null) {
+            notificationLargeIcon = BitmapFactory.decodeResource(
+                    getResources(), R.drawable.ic_large_smspost);
+        }
+        return notificationLargeIcon;
     }
 
     private void scheduleHeartbeat() {
