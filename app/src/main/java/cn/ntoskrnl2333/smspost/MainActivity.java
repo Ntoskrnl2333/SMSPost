@@ -1,6 +1,9 @@
 package cn.ntoskrnl2333.smspost;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +18,8 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -74,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText etUser;
     private TextInputEditText etPass;
     private MaterialSwitch switchAuth;
+    private ValueAnimator authFieldsAnimator;
 
     private boolean serviceStartAttempted;
 
@@ -181,7 +187,73 @@ public class MainActivity extends AppCompatActivity {
 
         boolean hasAuth = !configManager.getUser().isEmpty() || !configManager.getPass().isEmpty();
         switchAuth.setChecked(hasAuth);
-        authFields.setVisibility(hasAuth ? View.VISIBLE : View.GONE);
+        setAuthFieldsVisible(hasAuth, false);
+    }
+
+    /**
+     * Expands/collapses the basic-auth fields with a height animation instead of
+     * {@code android:animateLayoutChanges}, so the card and everything below it (the
+     * delivery-log section inside the same RecyclerView header) move together in one
+     * continuous layout pass per frame.
+     */
+    private void setAuthFieldsVisible(boolean visible, boolean animate) {
+        boolean currentlyVisible = authFields.getVisibility() == View.VISIBLE;
+        if (visible == currentlyVisible) {
+            return;
+        }
+        if (authFieldsAnimator != null) {
+            authFieldsAnimator.cancel();
+            authFieldsAnimator = null;
+        }
+        if (!animate) {
+            authFields.setVisibility(visible ? View.VISIBLE : View.GONE);
+            return;
+        }
+
+        if (visible) {
+            authFields.setVisibility(View.VISIBLE);
+        }
+
+        int start = visible ? 0 : authFields.getHeight();
+        int end = 0;
+        if (visible) {
+            View parent = (View) authFields.getParent();
+            int width = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight();
+            if (width <= 0) {
+                authFields.setVisibility(View.VISIBLE);
+                return;
+            }
+            authFields.measure(
+                    View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            end = authFields.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = authFields.getLayoutParams();
+        params.height = start;
+        authFields.setLayoutParams(params);
+
+        ValueAnimator animator = ValueAnimator.ofInt(start, end);
+        animator.setDuration(220L);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.addUpdateListener(animation -> {
+            ViewGroup.LayoutParams lp = authFields.getLayoutParams();
+            lp.height = (int) animation.getAnimatedValue();
+            authFields.setLayoutParams(lp);
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                ViewGroup.LayoutParams lp = authFields.getLayoutParams();
+                lp.height = visible ? ViewGroup.LayoutParams.WRAP_CONTENT : 0;
+                authFields.setLayoutParams(lp);
+                if (!visible) {
+                    authFields.setVisibility(View.GONE);
+                }
+            }
+        });
+        authFieldsAnimator = animator;
+        animator.start();
     }
 
     private void wireInteractions() {
@@ -190,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         View authToggleRow = headerView.findViewById(R.id.auth_toggle_row);
         authToggleRow.setOnClickListener(v -> switchAuth.toggle());
         switchAuth.setOnCheckedChangeListener((buttonView, isChecked) ->
-                authFields.setVisibility(isChecked ? View.VISIBLE : View.GONE));
+                setAuthFieldsVisible(isChecked, true));
 
         btnRefresh.setOnClickListener(v -> {
             animateRefresh();
@@ -474,6 +546,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (authFieldsAnimator != null) {
+            authFieldsAnimator.cancel();
+            authFieldsAnimator = null;
+        }
         ioExecutor.shutdownNow();
         super.onDestroy();
     }
