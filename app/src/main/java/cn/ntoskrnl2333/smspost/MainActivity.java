@@ -2,13 +2,10 @@ package cn.ntoskrnl2333.smspost;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -67,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private View statusDot;
     private View authFields;
     private TextView tvHeroStatus;
-    private TextView tvEndpoint;
     private TextView tvLogCount;
     private TextView tvEmptyTitle;
     private TextView tvEmptyBody;
@@ -163,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
     private void bindHeaderViews() {
         statusDot = headerView.findViewById(R.id.status_dot);
         tvHeroStatus = headerView.findViewById(R.id.tv_hero_status);
-        tvEndpoint = headerView.findViewById(R.id.tv_endpoint);
         tvLogCount = headerView.findViewById(R.id.tv_log_count);
         tvEmptyTitle = headerView.findViewById(R.id.tv_empty_title);
         tvEmptyBody = headerView.findViewById(R.id.tv_empty_body);
@@ -202,8 +197,6 @@ public class MainActivity extends AppCompatActivity {
             refreshLogs();
         });
         headerView.findViewById(R.id.btn_grant).setOnClickListener(v -> onGrantClicked());
-
-        tvEndpoint.setOnClickListener(v -> copyEndpoint());
 
         etUrl.addTextChangedListener(new TextWatcher() {
             @Override
@@ -268,18 +261,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void copyEndpoint() {
-        String url = configManager.getUrl();
-        if (url == null || url.isEmpty()) {
-            return;
-        }
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard != null) {
-            clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.section_endpoint), url));
-            Snackbar.make(root, R.string.endpoint_copied, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
     private void hideKeyboard() {
         View focus = getCurrentFocus();
         if (focus != null) {
@@ -299,31 +280,18 @@ public class MainActivity extends AppCompatActivity {
         if (!permissionsReady) {
             tvHeroStatus.setText(R.string.status_needs_setup);
             statusDot.setBackgroundResource(R.drawable.bg_dot_amber);
-            tvEndpoint.setText(R.string.status_setup_hint);
             permissionBanner.setVisibility(View.VISIBLE);
         } else if (!hasUrl) {
             tvHeroStatus.setText(R.string.status_needs_endpoint);
             statusDot.setBackgroundResource(R.drawable.bg_dot_amber);
-            tvEndpoint.setText(R.string.endpoint_not_set);
             permissionBanner.setVisibility(View.GONE);
         } else {
             tvHeroStatus.setText(R.string.status_active);
             statusDot.setBackgroundResource(R.drawable.bg_dot_active);
-            tvEndpoint.setText(url);
             permissionBanner.setVisibility(View.GONE);
         }
 
-        setEndpointCopyEnabled(hasUrl);
         tvBadgeRequired.setVisibility(hasUrl ? View.GONE : View.VISIBLE);
-    }
-
-    private void setEndpointCopyEnabled(boolean enabled) {
-        Drawable[] drawables = tvEndpoint.getCompoundDrawablesRelative();
-        if (drawables.length > 2 && drawables[2] != null) {
-            drawables[2].setAlpha(enabled ? 255 : 0);
-        }
-        tvEndpoint.setClickable(enabled);
-        tvEndpoint.setFocusable(enabled);
     }
 
     private void refreshLogs() {

@@ -7,9 +7,6 @@
     <string name="status_active">中继已就绪</string>
     <string name="status_needs_setup">需要完成设置</string>
     <string name="status_needs_endpoint">未配置接口</string>
-    <string name="status_setup_hint">请授予必要权限</string>
-    <string name="endpoint_not_set">尚未配置转发地址</string>
-    <string name="endpoint_copied">转发地址已复制</string>
 
     <!-- Configuration -->
     <string name="section_endpoint">转发地址</string>

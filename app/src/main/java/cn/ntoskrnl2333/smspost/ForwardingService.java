@@ -186,7 +186,6 @@ public class ForwardingService extends Service {
                 .setSmallIcon(R.drawable.ic_stat_smspost)
                 .setLargeIcon(getNotificationLargeIcon())
                 .setColor(getColor(R.color.notification_accent))
-                .setColorized(true)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
@@ -210,6 +209,9 @@ public class ForwardingService extends Service {
 
     private void scheduleHeartbeat() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) {
+            return;
+        }
         Intent intent = new Intent(this, BootReceiver.class);
         intent.setAction(ACTION_RESTART);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
@@ -217,11 +219,23 @@ public class ForwardingService extends Service {
         long interval = 3 * 60 * 1000; // 3 minutes
         long triggerAtMillis = System.currentTimeMillis() + interval;
 
-        if (alarmManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        // Android 12+ may deny SCHEDULE_EXACT_ALARM (Android 13+ never grants it by
+        // default), in which case setExact* throws SecurityException and would crash
+        // the service. Fall back to an inexact idle-tolerant alarm instead.
+        boolean canUseExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                || alarmManager.canScheduleExactAlarms();
+        try {
+            if (canUseExact && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
             } else {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+            }
+        } catch (SecurityException e) {
+            Log.w(TAG, "Exact alarm not permitted, using inexact heartbeat", e);
+            try {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+            } catch (Exception ignored) {
+                // Nothing else we can do here; the foreground service keeps the process alive.
             }
         }
     }

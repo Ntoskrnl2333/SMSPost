@@ -54,61 +54,33 @@
                 android:text="@string/hero_subtitle" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/status_pill"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
+                android:background="@drawable/bg_status_pill"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp">
 
-                <LinearLayout
-                    android:id="@+id/status_pill"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_status_pill"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="10dp"
-                    android:paddingTop="6dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="6dp">
-
-                    <View
-                        android:id="@+id/status_dot"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:background="@drawable/bg_dot_active" />
-
-                    <TextView
-                        android:id="@+id/tv_hero_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/status_active"
-                        android:textColor="@color/hero_text_primary"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                <View
+                    android:id="@+id/status_dot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_dot_active" />
 
                 <TextView
-                    android:id="@+id/tv_endpoint"
-                    android:layout_width="0dp"
+                    android:id="@+id/tv_hero_status"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:background="?attr/selectableItemBackground"
-                    android:drawableEnd="@drawable/ic_copy"
-                    android:drawablePadding="6dp"
-                    android:drawableTint="@color/hero_eyebrow"
-                    android:ellipsize="end"
-                    android:fontFamily="monospace"
-                    android:gravity="center_vertical"
-                    android:maxLines="1"
-                    android:minHeight="48dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:textColor="@color/hero_text_secondary"
-                    android:textSize="12sp"
-                    tools:text="http://192.168.1.10:8080/api/sms" />
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/status_active"
+                    android:textColor="@color/hero_text_primary"
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

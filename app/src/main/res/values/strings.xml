@@ -7,9 +7,6 @@
     <string name="status_active">Relay ready</string>
     <string name="status_needs_setup">Setup needed</string>
     <string name="status_needs_endpoint">Needs endpoint</string>
-    <string name="status_setup_hint">Grant the required permissions</string>
-    <string name="endpoint_not_set">No endpoint configured</string>
-    <string name="endpoint_copied">Endpoint copied to clipboard</string>
 
     <!-- Configuration -->
     <string name="section_endpoint">Relay endpoint</string>
