@@ -10,8 +10,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -48,7 +47,6 @@ public class ForwardingService extends Service {
 
     private PowerManager.WakeLock wakeLock;
     private WifiManager.WifiLock wifiLock;
-    private Bitmap notificationLargeIcon;
     private LogDatabaseHelper dbHelper;
     private ConfigManager configManager;
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -183,8 +181,7 @@ public class ForwardingService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.notif_title))
                 .setContentText(getString(R.string.notif_content))
-                .setSmallIcon(R.drawable.ic_stat_smspost)
-                .setLargeIcon(getNotificationLargeIcon())
+                .setSmallIcon(smallIconRes())
                 .setColor(getColor(R.color.notification_accent))
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
@@ -196,15 +193,16 @@ public class ForwardingService extends Service {
     }
 
     /**
-     * Full-colour app artwork shown on the right of the expanded notification; the small
-     * icon above stays a monochrome silhouette as Android requires.
+     * HONOR/MagicOS renders notification small icons in full colour, so there the launcher
+     * artwork is used and the shade icon looks exactly like the desktop one. Stock Android
+     * keeps only the alpha channel and tints it white, so other devices get the monochrome
+     * status icon instead of a solid white square.
      */
-    private Bitmap getNotificationLargeIcon() {
-        if (notificationLargeIcon == null) {
-            notificationLargeIcon = BitmapFactory.decodeResource(
-                    getResources(), R.drawable.ic_large_smspost);
-        }
-        return notificationLargeIcon;
+    private int smallIconRes() {
+        String manufacturer = Build.MANUFACTURER == null
+                ? "" : Build.MANUFACTURER.toLowerCase(Locale.ROOT);
+        boolean rendersColour = manufacturer.contains("honor") || manufacturer.contains("huawei");
+        return rendersColour ? R.drawable.ic_stat_smspost_color : R.drawable.ic_stat_smspost;
     }
 
     private void scheduleHeartbeat() {

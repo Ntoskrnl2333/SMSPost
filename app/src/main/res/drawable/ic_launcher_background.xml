@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Dark navy layer. The visible launcher artwork lives in ic_launcher_foreground
-    (full-bleed light gradient + bubble logo), so this colour is never seen.
-    OEMs such as HONOR tint the notification small-icon tile from the adaptive
-    icon background layer, so keeping it dark gives the white status icon the
-    contrast it needs on the notification shade.
--->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
         android:angle="315"
-        android:endColor="#123C6B"
-        android:startColor="#0A1B30"
+        android:endColor="#71BBE1"
+        android:startColor="#C1E5EF"
         android:type="linear" />
 </shape>
