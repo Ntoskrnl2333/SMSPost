@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  updatePeriodMillis = 1800000（30 分钟）= Android 允许的最小值。
+  桌面存在本小部件时，系统会周期性向 StatusWidgetProvider 发 APPWIDGET_UPDATE，
+  即使 ForwardingService 已经被杀，进程也会被创建并执行
+  onUpdate → KeepAliveManager.startAll()，从而恢复服务与排期。
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/widget_status"
+    android:minHeight="60dp"
+    android:minWidth="250dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen" />

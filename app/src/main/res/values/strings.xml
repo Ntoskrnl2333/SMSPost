@@ -51,4 +51,33 @@
     <string name="status_success">Success</string>
     <string name="status_failed">Failed: %1$s</string>
     <string name="status_failed_code">Failed Code: %1$d</string>
+    <!-- Keep-alive / 2.2.0 -->
+    <string name="keepalive_title">Keep-alive</string>
+    <string name="keepalive_status_running">Service running · heartbeat %1$s · restarts %2$d</string>
+    <string name="keepalive_status_stopped">Service not running · restarts %1$d</string>
+    <string name="keepalive_status_user_stopped">Forwarding stopped by you</string>
+    <string name="keepalive_battery_ok">Battery optimisation: exempt</string>
+    <string name="keepalive_battery_bad">Battery optimisation: not exempt (background limits apply)</string>
+    <string name="keepalive_exact_ok">Exact alarms: allowed</string>
+    <string name="keepalive_exact_bad">Exact alarms: not allowed (wake-ups may be delayed)</string>
+    <string name="keepalive_rom">Device: %1$s</string>
+    <string name="keepalive_autostart">Autostart</string>
+    <string name="keepalive_exact_alarm">Exact alarms</string>
+    <string name="keepalive_restart">Restart forwarding service</string>
+    <string name="keepalive_widget_hint">Tip: add the “SMSPost status” widget — the system wakes the app every 30 minutes, which is the strongest keep-alive.</string>
+    <string name="keepalive_autostart_toast">Opening %1$s autostart settings</string>
+    <string name="snack_service_restarted">Forwarding service restarted.</string>
+
+    <string name="status_pending">Queued (pending)</string>
+    <string name="notif_action_stop">Stop</string>
+
+    <string name="rescue_channel_name">Forwarding recovery</string>
+    <string name="rescue_title">Forwarding service was stopped</string>
+    <string name="rescue_content">Tap to resume background SMS forwarding</string>
+
+    <string name="widget_name">SMSPost status</string>
+    <string name="widget_status_alive">Forwarding · heartbeat %1$s</string>
+    <string name="widget_status_dead">Service not running</string>
+    <string name="widget_restarts">%1$d restarts · tap to open</string>
+    <string name="widget_hint_placeholder">Tap the widget to resume forwarding</string>
 </resources>

@@ -51,4 +51,33 @@
     <string name="status_success">成功</string>
     <string name="status_failed">失败：%1$s</string>
     <string name="status_failed_code">失败，状态码：%1$d</string>
+    <!-- Keep-alive / 2.2.0 -->
+    <string name="keepalive_title">保活</string>
+    <string name="keepalive_status_running">服务运行中 · 心跳 %1$s · 累计重启 %2$d 次</string>
+    <string name="keepalive_status_stopped">服务未运行 · 累计重启 %1$d 次</string>
+    <string name="keepalive_status_user_stopped">已手动停止转发</string>
+    <string name="keepalive_battery_ok">电池优化：已豁免</string>
+    <string name="keepalive_battery_bad">电池优化：未豁免（后台会受限）</string>
+    <string name="keepalive_exact_ok">精确闹钟：已允许</string>
+    <string name="keepalive_exact_bad">精确闹钟：未允许（唤醒可能被延后）</string>
+    <string name="keepalive_rom">机型：%1$s</string>
+    <string name="keepalive_autostart">自启动</string>
+    <string name="keepalive_exact_alarm">精确闹钟</string>
+    <string name="keepalive_restart">重启转发服务</string>
+    <string name="keepalive_widget_hint">提示：在桌面添加“SMSPost 状态”小部件，系统会每 30 分钟唤醒一次应用，这是最有效的保活手段。</string>
+    <string name="keepalive_autostart_toast">正在打开 %1$s 的自启动设置</string>
+    <string name="snack_service_restarted">转发服务已重启。</string>
+
+    <string name="status_pending">待发送（已入队）</string>
+    <string name="notif_action_stop">停止</string>
+
+    <string name="rescue_channel_name">转发服务恢复提醒</string>
+    <string name="rescue_title">转发服务已被系统停止</string>
+    <string name="rescue_content">点按立即恢复后台短信转发</string>
+
+    <string name="widget_name">SMSPost 状态</string>
+    <string name="widget_status_alive">转发中 · 心跳 %1$s</string>
+    <string name="widget_status_dead">服务未运行</string>
+    <string name="widget_restarts">累计重启 %1$d 次 · 点此打开</string>
+    <string name="widget_hint_placeholder">点按小部件可恢复转发</string>
 </resources>

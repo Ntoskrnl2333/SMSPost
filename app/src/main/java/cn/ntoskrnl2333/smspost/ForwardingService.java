@@ -1,7 +1,6 @@
 package cn.ntoskrnl2333.smspost;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -12,46 +11,52 @@ import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
-import android.telephony.SmsMessage;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Credentials;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
+/**
+ * 常驻前台服务：持有 WakeLock / WiFiLock、原生守护、3 分钟心跳，并负责补发队列。
+ *
+ * 2.2.0 的改动：
+ *  - Android 14+ 改用 specialUse 前台服务类型（dataSync 在 Android 15 有 6h/24h 配额）
+ *  - 心跳时间戳写入 SharedPreferences，配合同步的存活判定
+ *  - 启动时补发积压短信（队列由 SmsReceiver 写入）
+ *  - 通知栏增加"停止"操作；停止时取消所有保活排期并标记用户主动停止
+ *  - onTaskRemoved / onDestroy 通过一次性闹钟兜底复活
+ */
 public class ForwardingService extends Service {
+
     private static final String TAG = "ForwardingService";
     private static final String CHANNEL_ID = "SMSForwardingChannelV5";
     private static final int NOTIFICATION_ID = 1001;
-    public static final String ACTION_SEND_SMS = "cn.ntoskrnl2333.smspost.SEND_SMS";
-    private static final String ACTION_RESTART = "cn.ntoskrnl2333.smspost.RESTART_SERVICE";
+
+    public static final String ACTION_KEEPALIVE = "cn.ntoskrnl2333.smspost.KEEPALIVE";
+    public static final String ACTION_FLUSH = "cn.ntoskrnl2333.smspost.FLUSH";
+    public static final String ACTION_STOP = "cn.ntoskrnl2333.smspost.STOP";
+
+    private static final int REQUEST_NOTIFICATION_OPEN = 100;
+    private static final int REQUEST_NOTIFICATION_STOP = 101;
 
     private PowerManager.WakeLock wakeLock;
     private WifiManager.WifiLock wifiLock;
-    private LogDatabaseHelper dbHelper;
-    private ConfigManager configManager;
-    private final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build();
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable heartbeatTask = new Runnable() {
+        @Override
+        public void run() {
+            KeepAliveManager.noteHeartbeat(ForwardingService.this);
+            StatusWidgetProvider.refreshAll(ForwardingService.this);
+            handler.postDelayed(this, KeepAliveManager.HEARTBEAT_WRITE_MS);
+        }
+    };
 
     static {
         System.loadLibrary("keep_alive");
@@ -64,14 +69,13 @@ public class ForwardingService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "Service onCreate");
-        dbHelper = new LogDatabaseHelper(this);
-        configManager = new ConfigManager(this);
         createNotificationChannel();
-        
+
         // 1. CPU WakeLock
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SMSPost::ForwardingServiceWakeLock");
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    "SMSPost::ForwardingServiceWakeLock");
             wakeLock.acquire();
         }
 
@@ -86,97 +90,57 @@ public class ForwardingService extends Service {
         String lockFile = getFilesDir().getAbsolutePath() + "/.daemon_lock";
         initNativeDaemon(lockFile, getPackageName());
 
-        scheduleHeartbeat();
+        KeepAliveManager.noteHeartbeat(this);
+        KeepAliveManager.scheduleHeartbeat(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Service onStartCommand");
-        
-        startForeground(NOTIFICATION_ID, getNotification());
+        String action = intent == null ? null : intent.getAction();
+        Log.d(TAG, "Service onStartCommand, action=" + action);
 
-        if (intent != null && ACTION_SEND_SMS.equals(intent.getAction())) {
-            handleSmsIntent(intent);
+        if (ACTION_STOP.equals(action)) {
+            Log.i(TAG, "stop requested by user");
+            KeepAliveManager.stopAll(this);
+            handler.removeCallbacks(heartbeatTask);
+            stopForeground(true);
+            stopSelf();
+            return START_NOT_STICKY;
         }
 
-        scheduleHeartbeat();
+        startForegroundCompat(buildNotification());
+
+        KeepAliveManager.noteHeartbeat(this);
+        KeepAliveManager.scheduleHeartbeat(this);
+        KeepAliveManager.scheduleWatchdogJob(this);
+        SmsFlusher.flushAsync(this);
+        StatusWidgetProvider.refreshAll(this);
+
+        handler.removeCallbacks(heartbeatTask);
+        handler.post(heartbeatTask);
+
         return START_STICKY;
     }
 
-    private static String lastSmsFingerprint = ""; // 用于简单的去重
-
-    private void handleSmsIntent(Intent intent) {
-        // 1. 使用系统 API 获取合并后的短信对象数组
-        android.telephony.SmsMessage[] messages = android.provider.Telephony.Sms.Intents.getMessagesFromIntent(intent);
-        if (messages == null || messages.length == 0) return;
-
-        // 2. 将所有分段合并成完整内容
-        StringBuilder fullBody = new StringBuilder();
-        for (android.telephony.SmsMessage msg : messages) {
-            if (msg != null && msg.getDisplayMessageBody() != null) {
-                fullBody.append(msg.getDisplayMessageBody());
-            }
+    private void startForegroundCompat(Notification notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // API 34+：specialUse 不受 dataSync 的 6h/24h 配额限制
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(NOTIFICATION_ID, notification);
         }
-
-        String sender = messages[0].getDisplayOriginatingAddress();
-        long timestamp = messages[0].getTimestampMillis();
-        String body = fullBody.toString();
-
-        // 3. 简单的去重逻辑：如果发送者、内容和时间戳与上一条完全一致，则跳过
-        String fingerprint = sender + "|" + body + "|" + timestamp;
-        if (fingerprint.equals(lastSmsFingerprint)) {
-            Log.d(TAG, "检测到重复短信，已跳过处理");
-            return;
-        }
-        lastSmsFingerprint = fingerprint;
-
-        // 4. 发送到服务器
-        postSmsToServer(sender, body, timestamp);
     }
 
-    private void postSmsToServer(String sender, String content, long timestamp) {
-        String url = configManager.getUrl();
-        if (url == null || url.isEmpty()) {
-            dbHelper.addLog(timestamp, sender, content, getString(R.string.status_url_not_set));
-            return;
-        }
-
-        JSONObject json = new JSONObject();
-        try {
-            json.put("sender", sender);
-            json.put("content", content);
-            json.put("timestamp", timestamp);
-        } catch (JSONException e) {
-            Log.e(TAG, "JSON creation error", e);
-        }
-
-        RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
-        Request.Builder requestBuilder = new Request.Builder().url(url).post(body);
-
-        String user = configManager.getUser();
-        if (user != null && !user.isEmpty()) {
-            requestBuilder.header("Authorization", Credentials.basic(user, configManager.getPass()));
-        }
-
-        client.newCall(requestBuilder.build()).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                dbHelper.addLog(timestamp, sender, content, getString(R.string.status_failed, e.getMessage()));
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String status = response.isSuccessful() ? getString(R.string.status_success) : getString(R.string.status_failed_code, response.code());
-                dbHelper.addLog(timestamp, sender, content, status);
-                response.close();
-            }
-        });
-    }
-
-    private Notification getNotification() {
+    private Notification buildNotification() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, REQUEST_NOTIFICATION_OPEN,
+                notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        Intent stopIntent = new Intent(this, ForwardingService.class).setAction(ACTION_STOP);
+        PendingIntent stopPendingIntent = PendingIntent.getService(this, REQUEST_NOTIFICATION_STOP,
+                stopIntent, PendingIntent.FLAG_IMMUTABLE);
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.notif_title))
@@ -189,6 +153,8 @@ public class ForwardingService extends Service {
                 .setSilent(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+                .addAction(0, getString(R.string.notif_action_stop), stopPendingIntent)
                 .build();
     }
 
@@ -205,42 +171,10 @@ public class ForwardingService extends Service {
         return rendersColour ? R.drawable.ic_stat_smspost_color : R.drawable.ic_stat_smspost;
     }
 
-    private void scheduleHeartbeat() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager == null) {
-            return;
-        }
-        Intent intent = new Intent(this, BootReceiver.class);
-        intent.setAction(ACTION_RESTART);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        long interval = 3 * 60 * 1000; // 3 minutes
-        long triggerAtMillis = System.currentTimeMillis() + interval;
-
-        // Android 12+ may deny SCHEDULE_EXACT_ALARM (Android 13+ never grants it by
-        // default), in which case setExact* throws SecurityException and would crash
-        // the service. Fall back to an inexact idle-tolerant alarm instead.
-        boolean canUseExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-                || alarmManager.canScheduleExactAlarms();
-        try {
-            if (canUseExact && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
-            } else {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
-            }
-        } catch (SecurityException e) {
-            Log.w(TAG, "Exact alarm not permitted, using inexact heartbeat", e);
-            try {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
-            } catch (Exception ignored) {
-                // Nothing else we can do here; the foreground service keeps the process alive.
-            }
-        }
-    }
-
     @Override
     public void onDestroy() {
         Log.d(TAG, "Service onDestroy");
+        handler.removeCallbacks(heartbeatTask);
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
         }
@@ -248,8 +182,11 @@ public class ForwardingService extends Service {
             wifiLock.release();
         }
         super.onDestroy();
-        
-        Intent restartIntent = new Intent(ACTION_RESTART);
+
+        // 一次性闹钟兜底：进程若在此后被杀，仍有机会被系统唤醒。
+        KeepAliveManager.scheduleRevive(this, 15_000L);
+        Intent restartIntent = new Intent(KeepAliveManager.ACTION_RESTART);
+        restartIntent.setPackage(getPackageName());
         sendBroadcast(restartIntent);
     }
 
@@ -257,12 +194,18 @@ public class ForwardingService extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         Log.d(TAG, "Task removed, restarting...");
-        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        KeepAliveManager.scheduleRevive(this, 5_000L);
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass())
+                .setAction(ACTION_KEEPALIVE);
         restartServiceIntent.setPackage(getPackageName());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(restartServiceIntent);
-        } else {
-            startService(restartServiceIntent);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(restartServiceIntent);
+            } else {
+                startService(restartServiceIntent);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "restart after task removal failed", e);
         }
     }
 

@@ -286,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        wireKeepAliveCard();
     }
 
     private void saveConfig() {
@@ -364,13 +365,72 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tvBadgeRequired.setVisibility(hasUrl ? View.GONE : View.VISIBLE);
+        updateKeepAliveCard();
+    }
+
+    /** 卡片上的三个操作：自启动页 / 精确闹钟页 / 重启服务。 */
+    private void wireKeepAliveCard() {
+        View autostart = headerView.findViewById(R.id.btn_autostart);
+        if (autostart != null) {
+            autostart.setOnClickListener(v -> {
+                BatteryOptimizationHelper.openAutoStartSettings(this);
+                Toast.makeText(this,
+                        getString(R.string.keepalive_autostart_toast, BatteryOptimizationHelper.romLabel()),
+                        Toast.LENGTH_LONG).show();
+            });
+        }
+        View exactAlarm = headerView.findViewById(R.id.btn_exact_alarm);
+        if (exactAlarm != null) {
+            exactAlarm.setOnClickListener(v -> BatteryOptimizationHelper.openExactAlarmSettings(this));
+        }
+        View restart = headerView.findViewById(R.id.btn_restart_service);
+        if (restart != null) {
+            restart.setOnClickListener(v -> {
+                KeepAliveManager.setUserStopped(this, false);
+                KeepAliveManager.startAll(this);
+                startSmsService();
+                updateKeepAliveCard();
+                Snackbar.make(root, R.string.snack_service_restarted, Snackbar.LENGTH_SHORT).show();
+            });
+        }
+        View widgetHint = headerView.findViewById(R.id.tv_widget_hint);
+        if (widgetHint != null) {
+            widgetHint.setOnClickListener(v ->
+                    Snackbar.make(root, R.string.keepalive_widget_hint, Snackbar.LENGTH_LONG).show());
+        }
+    }
+
+    /** 刷新保活卡片：心跳 / 重启次数 / 电池优化 / 精确闹钟 / 机型。 */
+    private void updateKeepAliveCard() {
+        TextView status = headerView.findViewById(R.id.tv_keepalive_status);
+        if (status == null) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (KeepAliveManager.isUserStopped(this)) {
+            sb.append(getString(R.string.keepalive_status_user_stopped));
+        } else if (KeepAliveManager.isServiceAlive(this)) {
+            long beat = KeepAliveManager.lastHeartbeatWall(this);
+            String time = beat > 0
+                    ? new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                            .format(new java.util.Date(beat))
+                    : "--:--";
+            sb.append(getString(R.string.keepalive_status_running, time,
+                    KeepAliveManager.getRestartCount(this)));
+        } else {
+            sb.append(getString(R.string.keepalive_status_stopped,
+                    KeepAliveManager.getRestartCount(this)));
+        }
+        sb.append('\n').append(getString(BatteryOptimizationHelper.isIgnoringBatteryOptimizations(this)
+                ? R.string.keepalive_battery_ok : R.string.keepalive_battery_bad));
+        sb.append('\n').append(getString(KeepAliveManager.canScheduleExactAlarms(this)
+                ? R.string.keepalive_exact_ok : R.string.keepalive_exact_bad));
+        sb.append('\n').append(getString(R.string.keepalive_rom, BatteryOptimizationHelper.romLabel()));
+        status.setText(sb.toString());
     }
 
     private void refreshLogs() {
-        if (!hasStoragePermission()) {
-            renderLogs(new ArrayList<>(), true);
-            return;
-        }
+        // 数据库会自动回退到应用内部存储，不再依赖“所有文件访问”权限。
         ioExecutor.execute(() -> {
             List<LogEntry> entries;
             try {
@@ -534,7 +594,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         boolean allGranted = hasSmsPermission() && hasNotificationPermission() && hasStoragePermission();
-        if (allGranted && !serviceStartAttempted) {
+        if (allGranted && !serviceStartAttempted && !KeepAliveManager.isUserStopped(this)) {
             // Same as the original flow: ask for the battery-optimisation exemption
             // before the first service start of this activity instance.
             requestIgnoreBatteryOptimizations();
